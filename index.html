@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f4efe8" />
+  <title>Memory Lane | Private Family Memories</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4efe8;
+      --ink: #1e1a16;
+      --muted: #6f645d;
+      --clay: #f8d7c2;
+      --dusty-rose: #e8b4a8;
+      --sage: #a8c7b6;
+      --sun: #f2c94c;
+      --shadow: rgba(30, 26, 22, 0.12);
+      --card: #fffaf5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Sora", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 20%, rgba(242, 201, 76, 0.18), transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(168, 199, 182, 0.25), transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(232, 180, 168, 0.25), transparent 50%),
+        linear-gradient(180deg, #fdf8f2 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3 {
+      font-family: "Fraunces", serif;
+      margin: 0;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(30, 26, 22, 0.18);
+      object-fit: cover;
+    }
+
+    .brand h1 {
+      font-size: 1.8rem;
+      letter-spacing: 0.4px;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(30, 26, 22, 0.08);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 16px 40px var(--shadow);
+      border: 1px solid rgba(30, 26, 22, 0.08);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 16px;
+      background: rgba(232, 180, 168, 0.12);
+      border: 1px solid rgba(30, 26, 22, 0.08);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.5rem;
+      font-family: "Fraunces", serif;
+      margin-bottom: 6px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      font-family: "Sora", sans-serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(30, 26, 22, 0.2);
+    }
+
+    .btn-soft {
+      background: rgba(168, 199, 182, 0.2);
+      color: var(--ink);
+    }
+
+    .toggle-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(30, 26, 22, 0.08);
+    }
+
+    .toggle-button {
+      border-radius: 999px;
+      padding: 8px 14px;
+      background: transparent;
+      border: none;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .toggle-button.active {
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 0 8px 16px rgba(30, 26, 22, 0.16);
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .timeline-summary {
+      display: grid;
+      gap: 8px;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .timeline-group {
+      display: grid;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(30, 26, 22, 0.06);
+    }
+
+    .timeline-group h3 {
+      font-size: 1.2rem;
+    }
+
+    .memory-card {
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid rgba(30, 26, 22, 0.08);
+      box-shadow: 0 12px 24px rgba(30, 26, 22, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 340px;
+      animation: rise 0.6s ease both;
+    }
+
+    .memory-media {
+      height: 180px;
+      background: linear-gradient(135deg, rgba(168, 199, 182, 0.5), rgba(232, 180, 168, 0.5));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .memory-media img,
+    .memory-media video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .memory-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .memory-meta {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .memory-caption {
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: rgba(242, 201, 76, 0.18);
+      padding: 8px 10px;
+      border-radius: 12px;
+    }
+
+    .memory-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      background: rgba(242, 201, 76, 0.25);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+    }
+
+    .login-shell {
+      max-width: 520px;
+      margin: 80px auto;
+      text-align: left;
+      animation: fadeInUp 0.6s ease both;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    input, textarea, select {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(30, 26, 22, 0.12);
+      font-family: "Sora", sans-serif;
+      font-size: 0.95rem;
+    }
+
+    textarea { resize: vertical; min-height: 110px; }
+
+    .helper {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .notice {
+      background: rgba(242, 201, 76, 0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+    }
+
+    .hidden { display: none; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 26, 22, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 10;
+    }
+
+    .modal.active { display: flex; }
+
+    .modal-card {
+      width: min(760px, 95vw);
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--card);
+      border-radius: 22px;
+      padding: 24px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .brand h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img src="logo.svg" alt="Memory Lane logo" />
+        <div>
+          <h1>Memory Lane</h1>
+          <div class="tagline">A private lane for your family stories.</div>
+        </div>
+      </div>
+      <div class="chip" id="statusChip">Invite-only family circle</div>
+    </header>
+
+    <section id="loginView" class="login-shell panel">
+      <h2>Welcome back</h2>
+      <p class="helper">Request your personal invite link. Only listed family members can enter.</p>
+      <div class="notice">
+        Tip: Use the exact email and username assigned to you by your family admin.
+      </div>
+      <form id="loginForm">
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" placeholder="you@family.com" required />
+        </div>
+        <div class="field">
+          <label for="loginUsername">Family username</label>
+          <input id="loginUsername" type="text" placeholder="grandpa-joe" required />
+        </div>
+        <button class="btn-primary" type="submit">Send invite link</button>
+        <p class="helper" id="loginMessage"></p>
+      </form>
+    </section>
+
+    <section id="appView" class="hidden">
+      <div class="panel">
+        <div class="actions" style="justify-content: space-between; align-items: center;">
+          <div>
+            <h2 id="welcomeName">Hello</h2>
+            <div class="helper">Your private family timeline.</div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="addMemoryBtn">Add memory</button>
+            <a class="btn-soft hidden" id="adminLink" href="admin.html">Admin</a>
+            <button class="btn-soft" id="signOutBtn">Sign out</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="stat">
+          <strong id="memoryCount">0</strong>
+          Memories saved
+        </div>
+        <div class="stat">
+          <strong id="latestMemory">--</strong>
+          Latest memory date
+        </div>
+        <div class="stat">
+          <strong id="familyCount">0</strong>
+          Family members allowed
+        </div>
+      </div>
+
+      <div class="panel" style="margin-bottom: 20px;">
+        <div class="actions" style="justify-content: space-between; align-items: center;">
+          <div class="toggle-group" id="timelineToggles">
+            <button class="toggle-button active" type="button" data-view="day">Day</button>
+            <button class="toggle-button" type="button" data-view="week">Week</button>
+            <button class="toggle-button" type="button" data-view="month">Month</button>
+            <button class="toggle-button" type="button" data-view="year">Year</button>
+          </div>
+          <div class="field" style="margin: 0; min-width: 200px;">
+            <label for="timelineDate" class="helper">Choose date</label>
+            <input id="timelineDate" type="date" />
+          </div>
+        </div>
+        <div class="timeline-summary" id="timelineSummary"></div>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+
+      <div class="footer" id="setupHint"></div>
+    </section>
+  </div>
+
+  <div class="modal" id="memoryModal" aria-hidden="true">
+    <div class="modal-card">
+      <h2 id="memoryModalTitle">Add a memory</h2>
+      <form id="memoryForm">
+        <div class="split">
+          <div class="field">
+            <label for="memoryTitle">Title</label>
+            <input id="memoryTitle" type="text" placeholder="Sunday picnic" required />
+          </div>
+          <div class="field">
+            <label for="memoryDate">Date</label>
+            <input id="memoryDate" type="date" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="memoryStory">Story</label>
+          <textarea id="memoryStory" placeholder="What happened? Who was there?"></textarea>
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="memoryTags">Tags</label>
+            <input id="memoryTags" type="text" placeholder="beach, birthday, 2004" />
+          </div>
+          <div class="field">
+            <label for="memoryLocation">Location</label>
+            <input id="memoryLocation" type="text" placeholder="Sydney" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="memoryMedia">Photo or video</label>
+          <input id="memoryMedia" type="file" accept="image/*,video/*" />
+          <div class="helper">Optional. Leave empty to keep existing media when editing.</div>
+        </div>
+        <div class="field">
+          <label for="memoryCaption">Caption for photo/video</label>
+          <input id="memoryCaption" type="text" placeholder="Mom cutting the cake" />
+          <div class="helper">If you leave this empty, the app creates a short caption from the story.</div>
+        </div>
+        <div class="actions" style="justify-content: flex-end;">
+          <button type="button" class="btn-soft" id="cancelMemoryBtn">Cancel</button>
+          <button type="submit" class="btn-primary" id="memorySubmitBtn">Save memory</button>
+        </div>
+        <p class="helper" id="memoryMessage"></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

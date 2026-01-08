@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f4efe8" />
+  <title>Memory Lane | Admin</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4efe8;
+      --ink: #1e1a16;
+      --muted: #6f645d;
+      --clay: #f8d7c2;
+      --dusty-rose: #e8b4a8;
+      --sage: #a8c7b6;
+      --sun: #f2c94c;
+      --shadow: rgba(30, 26, 22, 0.12);
+      --card: #fffaf5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Sora", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 20%, rgba(242, 201, 76, 0.18), transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(168, 199, 182, 0.25), transparent 40%),
+        radial-gradient(circle at 50% 90%, rgba(232, 180, 168, 0.25), transparent 50%),
+        linear-gradient(180deg, #fdf8f2 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    h1, h2, h3 {
+      font-family: "Fraunces", serif;
+      margin: 0;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(30, 26, 22, 0.18);
+      object-fit: cover;
+    }
+
+    .brand h1 {
+      font-size: 1.8rem;
+      letter-spacing: 0.4px;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 16px 40px var(--shadow);
+      border: 1px solid rgba(30, 26, 22, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    button, .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-family: "Sora", sans-serif;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      background: rgba(168, 199, 182, 0.25);
+      color: var(--ink);
+    }
+
+    .btn-primary {
+      background: var(--ink);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(30, 26, 22, 0.2);
+    }
+
+    button:hover, .btn:hover { transform: translateY(-1px); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    input, select, textarea {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(30, 26, 22, 0.12);
+      font-family: "Sora", sans-serif;
+      font-size: 0.95rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(30, 26, 22, 0.08);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(242, 201, 76, 0.2);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+    }
+
+    .helper {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .notice {
+      background: rgba(242, 201, 76, 0.18);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+    }
+
+    .memory-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(30, 26, 22, 0.08);
+    }
+
+    .memory-item:last-child { border-bottom: none; }
+
+    .muted { color: var(--muted); }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <img src="logo.svg" alt="Memory Lane logo" />
+        <div>
+          <h1>Admin</h1>
+          <div class="tagline">Manage family access and memories.</div>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn" href="index.html">Back to Memory Lane</a>
+        <button class="btn-primary" id="signOutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2>Admin access</h2>
+      <p class="helper" id="adminStatus">Checking your account...</p>
+      <div class="notice">
+        Admins are controlled by the <code>is_admin</code> flag in <code>family_members</code> (config fallback for first setup).
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Family members</h2>
+      <div class="grid">
+        <div>
+          <div class="pill" id="memberCount">0 members</div>
+        </div>
+        <form id="memberForm">
+          <div class="field">
+            <label for="memberEmail">Email</label>
+            <input id="memberEmail" type="email" placeholder="name@family.com" required />
+          </div>
+          <div class="field">
+            <label for="memberUsername">Username</label>
+            <input id="memberUsername" type="text" placeholder="mom" required />
+          </div>
+          <div class="field">
+            <label for="memberAdmin">Admin access</label>
+            <select id="memberAdmin">
+              <option value="no">Standard member</option>
+              <option value="yes">Admin</option>
+            </select>
+          </div>
+          <button class="btn-primary" type="submit">Add member</button>
+          <p class="helper" id="memberMessage"></p>
+        </form>
+      </div>
+      <div style="overflow-x: auto; margin-top: 12px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Username</th>
+              <th>Admin</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="memberTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent memories</h2>
+      <div class="pill" id="memoryCount">0 memories</div>
+      <div id="memoryList" style="margin-top: 12px;"></div>
+      <p class="helper" id="memoryMessage"></p>
+    </section>
+
+    <section class="panel hidden" id="editPanel">
+      <h2>Edit memory</h2>
+      <form id="editForm">
+        <div class="field">
+          <label for="editTitle">Title</label>
+          <input id="editTitle" type="text" required />
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label for="editDate">Date</label>
+            <input id="editDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="editLocation">Location</label>
+            <input id="editLocation" type="text" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="editTags">Tags</label>
+          <input id="editTags" type="text" placeholder="beach, birthday, 2004" />
+        </div>
+        <div class="field">
+          <label for="editCaption">Media caption</label>
+          <input id="editCaption" type="text" placeholder="Mom cutting the cake" />
+        </div>
+        <div class="field">
+          <label for="editStory">Story</label>
+          <textarea id="editStory"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" type="submit">Save changes</button>
+          <button class="btn" type="button" id="cancelEditBtn">Cancel</button>
+        </div>
+        <p class="helper" id="editMessage"></p>
+      </form>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
