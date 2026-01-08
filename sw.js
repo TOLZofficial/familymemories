@@ -1,4 +1,4 @@
-const CACHE_NAME = "memory-lane-v1";
+const CACHE_NAME = "memory-lane-v2";
 const ASSETS = [
   "/",
   "/index.html",
