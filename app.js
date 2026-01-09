@@ -351,7 +351,11 @@ const getRangeForView = (view, anchor) => {
   let end = addDays(start, 1);
   let label = formatDate(start);
 
-  if (view === "week") {
+  if (view === "all") {
+    start = new Date(1970, 0, 1);
+    end = new Date(9999, 0, 1);
+    label = "All-time";
+  } else if (view === "week") {
     start = startOfWeek(anchor);
     end = addDays(start, 7);
     label = `${formatDate(start)} - ${formatDate(addDays(end, -1))}`;
