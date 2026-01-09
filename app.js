@@ -7,6 +7,7 @@ const ui = {
   loginEmail: document.getElementById("loginEmail"),
   loginUsername: document.getElementById("loginUsername"),
   loginMethod: document.getElementById("loginMethod"),
+  loginMethodToggle: document.getElementById("loginMethodToggle"),
   loginCode: document.getElementById("loginCode"),
   codeField: document.getElementById("codeField"),
   verifyCodeBtn: document.getElementById("verifyCodeBtn"),
@@ -872,12 +873,15 @@ const initSupabase = async () => {
   await applyAuthState(data.session);
 };
 
-ui.loginMethod.addEventListener("change", () => {
-  if (ui.loginMethod.value === "code") {
-    ui.codeField.style.display = "block";
-  } else {
-    ui.codeField.style.display = "none";
-  }
+ui.loginMethodToggle.addEventListener("click", (event) => {
+  const button = event.target.closest(".toggle-button");
+  if (!button) return;
+  const method = button.dataset.method;
+  ui.loginMethod.value = method;
+  ui.loginMethodToggle
+    .querySelectorAll(".toggle-button")
+    .forEach((btn) => btn.classList.toggle("active", btn === button));
+  ui.codeField.style.display = method === "code" ? "block" : "none";
 });
 
 const registerServiceWorker = () => {

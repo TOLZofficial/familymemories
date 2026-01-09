@@ -176,6 +176,10 @@
       border: 1px solid rgba(30, 26, 22, 0.08);
     }
 
+    .toggle-group.compact {
+      padding: 4px;
+    }
+
     .toggle-button {
       border-radius: 999px;
       padding: 8px 14px;
@@ -457,11 +461,17 @@
           <input id="loginUsername" type="text" placeholder="grandpa-joe" required />
         </div>
         <div class="field">
-          <label for="loginMethod">Sign-in method</label>
-          <select id="loginMethod">
-            <option value="code" selected>Email code (recommended)</option>
-            <option value="link">Magic link (opens Safari)</option>
-          </select>
+          <label>Sign-in method</label>
+          <div class="toggle-group compact" id="loginMethodToggle">
+            <button class="toggle-button active" type="button" data-method="code">
+              Email code
+            </button>
+            <button class="toggle-button" type="button" data-method="link">
+              Magic link
+            </button>
+          </div>
+          <input type="hidden" id="loginMethod" value="code" />
+          <div class="helper">Code is best for the PWA. Magic link opens Safari.</div>
         </div>
         <button class="btn-primary" type="submit">Send code</button>
         <div class="field" id="codeField" style="display: none;">
