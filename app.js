@@ -45,6 +45,13 @@ let timelineView = "day";
 let timelineAnchor = new Date();
 let timelineInitialized = false;
 
+const LIMITS = {
+  maxVideoMB: 50,
+  maxImageMB: 10,
+  maxImageDimension: 1600,
+  imageQuality: 0.82
+};
+
 const normalize = (value) => value.trim().toLowerCase();
 
 const allowedLookup = () =>
@@ -65,6 +72,8 @@ const showMessage = (node, message, isError = false) => {
   node.textContent = message;
   node.style.color = isError ? "#a0412d" : "#3c6e58";
 };
+
+const bytesToMB = (bytes) => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
 const toLocalDateKey = (date) => {
   const year = date.getFullYear();
@@ -610,11 +619,59 @@ const uploadMediaFile = async (file) => {
   return { url: data.publicUrl, type: file.type };
 };
 
+const compressImageFile = (file) =>
+  new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const maxDim = LIMITS.maxImageDimension;
+      const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+      const width = Math.round(img.width * scale);
+      const height = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        resolve(file);
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) {
+            resolve(file);
+            return;
+          }
+          const name = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+          resolve(new File([blob], name, { type: "image/jpeg" }));
+        },
+        "image/jpeg",
+        LIMITS.imageQuality
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(file);
+    };
+    img.src = url;
+  });
+
 const uploadMediaFiles = async (files, captions, baseMemory) => {
   const items = [];
   for (let i = 0; i < files.length; i += 1) {
     const file = files[i];
-    const media = await uploadMediaFile(file);
+    if (file.type.startsWith("video") && bytesToMB(file.size) > LIMITS.maxVideoMB) {
+      throw new Error(
+        `Video "${file.name}" is ${bytesToMB(file.size)}MB. Max allowed is ${LIMITS.maxVideoMB}MB.`
+      );
+    }
+    const uploadFile = file.type.startsWith("image")
+      ? await compressImageFile(file)
+      : file;
+    const media = await uploadMediaFile(uploadFile);
     items.push({
       url: media.url,
       type: media.type,

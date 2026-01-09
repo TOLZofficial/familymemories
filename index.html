@@ -158,6 +158,12 @@
       color: var(--ink);
       border: 1px solid rgba(30, 26, 22, 0.08);
       font-weight: 600;
+      border-radius: 999px;
+      padding: 12px 20px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .toggle-group {
@@ -543,7 +549,7 @@
         <div class="field">
           <label for="memoryMedia">Photo or video</label>
           <input id="memoryMedia" type="file" accept="image/*,video/*" multiple />
-          <div class="helper">Optional. Leave empty to keep existing media when editing.</div>
+          <div class="helper">Images are compressed before upload. Videos over 50MB are blocked.</div>
         </div>
         <div class="field">
           <label for="memoryCaptions">Media captions (one per file)</label>
