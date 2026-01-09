@@ -24,6 +24,7 @@ const ui = {
   memoryForm: document.getElementById("memoryForm"),
   memoryTitle: document.getElementById("memoryTitle"),
   memoryDate: document.getElementById("memoryDate"),
+  memoryEntryDate: document.getElementById("memoryEntryDate"),
   memoryStory: document.getElementById("memoryStory"),
   memoryTags: document.getElementById("memoryTags"),
   memoryLocation: document.getElementById("memoryLocation"),
@@ -96,7 +97,11 @@ const addDays = (date, days) => {
 };
 
 const getMemoryDate = (memory) =>
-  memory.memory_date ? new Date(memory.memory_date) : new Date(memory.created_at);
+  memory.memory_date
+    ? new Date(memory.memory_date)
+    : memory.entry_date
+    ? new Date(memory.entry_date)
+    : new Date(memory.created_at);
 
 const getAutoCaption = (memory) => {
   if (memory.title) return memory.title;
@@ -162,7 +167,7 @@ const summarizeMemories = () => {
   ui.memoryCount.textContent = memories.length.toString();
   ui.familyCount.textContent = CONFIG.allowedUsers.length.toString();
   const dates = memories
-    .map((memory) => memory.memory_date || memory.created_at)
+    .map((memory) => memory.memory_date || memory.entry_date || memory.created_at)
     .filter(Boolean)
     .sort((a, b) => new Date(b) - new Date(a));
   ui.latestMemory.textContent = dates[0] ? formatDate(dates[0]) : "--";
@@ -200,7 +205,7 @@ const createMemoryCard = (memory) => {
 
   const meta = document.createElement("div");
   meta.className = "memory-meta";
-  const dateText = formatDate(memory.memory_date || memory.created_at);
+  const dateText = formatDate(memory.memory_date || memory.entry_date || memory.created_at);
   meta.textContent = `${dateText}${memory.location ? ` - ${memory.location}` : ""}`;
 
   const story = document.createElement("div");
@@ -382,7 +387,7 @@ const loadMemories = async () => {
   const { data, error } = await supabaseClient
     .from("memories")
     .select(
-      "id, title, story, tags, location, memory_date, created_at, media_url, media_type, media_caption, owner_email"
+      "id, title, story, tags, location, memory_date, entry_date, created_at, media_url, media_type, media_caption, owner_email"
     )
     .order("memory_date", { ascending: false })
     .order("created_at", { ascending: false });
@@ -482,6 +487,7 @@ const startEditMemory = (memoryId) => {
   ui.memorySubmitBtn.textContent = "Update memory";
   ui.memoryTitle.value = memory.title || "";
   ui.memoryDate.value = memory.memory_date || "";
+  ui.memoryEntryDate.value = memory.entry_date || "";
   ui.memoryStory.value = memory.story || "";
   ui.memoryTags.value = (memory.tags || []).join(", ");
   ui.memoryLocation.value = memory.location || "";
@@ -536,7 +542,8 @@ const handleMemorySubmit = async (event) => {
       title: ui.memoryTitle.value.trim(),
       story: ui.memoryStory.value.trim(),
       location: ui.memoryLocation.value.trim(),
-      memory_date: ui.memoryDate.value || null
+      memory_date: ui.memoryDate.value || null,
+      entry_date: ui.memoryEntryDate.value || null
     };
 
     let caption = ui.memoryCaption.value.trim();
@@ -550,6 +557,7 @@ const handleMemorySubmit = async (event) => {
       tags,
       location: baseMemory.location,
       memory_date: baseMemory.memory_date,
+      entry_date: baseMemory.entry_date,
       media_url: mediaUrl,
       media_type: mediaType,
       media_caption: caption
@@ -625,7 +633,7 @@ const setupHints = () => {
   }
 
   ui.setupHint.textContent =
-    "Need help? Create a Supabase bucket named `memory-lane` and add `media_caption` and `is_admin` columns with RLS.";
+    "Need help? Create a Supabase bucket named `memory-lane` and add `media_caption`, `entry_date`, and `is_admin` columns with RLS.";
 };
 
 const initSupabase = async () => {

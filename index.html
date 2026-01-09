@@ -128,7 +128,8 @@
       gap: 12px;
     }
 
-    button {
+    button,
+    .btn {
       border: none;
       border-radius: 999px;
       padding: 12px 20px;
@@ -136,9 +137,15 @@
       font-size: 0.95rem;
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      line-height: 1;
     }
 
-    button:hover { transform: translateY(-1px); }
+    button:hover,
+    .btn:hover { transform: translateY(-1px); }
 
     .btn-primary {
       background: var(--ink);
@@ -149,6 +156,8 @@
     .btn-soft {
       background: rgba(168, 199, 182, 0.2);
       color: var(--ink);
+      border: 1px solid rgba(30, 26, 22, 0.08);
+      font-weight: 600;
     }
 
     .toggle-group {
@@ -412,7 +421,7 @@
           </div>
           <div class="actions">
             <button class="btn-primary" id="addMemoryBtn">Add memory</button>
-            <a class="btn-soft hidden" id="adminLink" href="admin.html">Admin</a>
+            <a class="btn btn-soft hidden" id="adminLink" href="admin.html">Admin</a>
             <button class="btn-soft" id="signOutBtn">Sign out</button>
           </div>
         </div>
@@ -468,6 +477,11 @@
             <label for="memoryDate">Date</label>
             <input id="memoryDate" type="date" />
           </div>
+        </div>
+        <div class="field">
+          <label for="memoryEntryDate">Entry date</label>
+          <input id="memoryEntryDate" type="date" />
+          <div class="helper">Optional. Use this to backdate when you added the memory.</div>
         </div>
         <div class="field">
           <label for="memoryStory">Story</label>
