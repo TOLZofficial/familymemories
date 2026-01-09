@@ -29,7 +29,7 @@ const ui = {
   memoryTags: document.getElementById("memoryTags"),
   memoryLocation: document.getElementById("memoryLocation"),
   memoryMedia: document.getElementById("memoryMedia"),
-  memoryCaption: document.getElementById("memoryCaption"),
+  memoryCaptions: document.getElementById("memoryCaptions"),
   memoryMessage: document.getElementById("memoryMessage"),
   cancelMemoryBtn: document.getElementById("cancelMemoryBtn"),
   memorySubmitBtn: document.getElementById("memorySubmitBtn"),
@@ -119,6 +119,51 @@ const getDisplayCaption = (memory) =>
     ? memory.media_caption.trim()
     : getAutoCaption(memory);
 
+const getCaptionLines = (value) =>
+  value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+const buildCaptionForFile = (baseMemory, file, providedCaption) => {
+  if (providedCaption) return providedCaption;
+  if (baseMemory.title || baseMemory.story || baseMemory.location) {
+    return getAutoCaption(baseMemory);
+  }
+  if (file && file.name) {
+    return file.name.replace(/[-_]+/g, " ").replace(/\.[^.]+$/, "");
+  }
+  return "Family memory";
+};
+
+const getMediaItems = (memory) => {
+  if (Array.isArray(memory.media_items) && memory.media_items.length) {
+    return memory.media_items;
+  }
+  if (memory.media_url) {
+    return [
+      {
+        url: memory.media_url,
+        type: memory.media_type || "",
+        caption: memory.media_caption || ""
+      }
+    ];
+  }
+  return [];
+};
+
+const getMediaCaptionSummary = (items) => {
+  const captions = items
+    .map((item) => (item.caption || "").trim())
+    .filter(Boolean);
+  if (!captions.length) return "";
+  const sample = captions.slice(0, 3).join(" • ");
+  if (captions.length > 3) {
+    return `${sample} • +${captions.length - 3} more`;
+  }
+  return sample;
+};
+
 const getHighlight = (memory) =>
   memory.title ||
   (memory.media_caption && memory.media_caption.trim()) ||
@@ -180,16 +225,50 @@ const createMemoryCard = (memory) => {
   const media = document.createElement("div");
   media.className = "memory-media";
 
-  if (memory.media_url) {
-    if (memory.media_type && memory.media_type.startsWith("video")) {
+  const mediaItems = getMediaItems(memory);
+
+  if (mediaItems.length > 1) {
+    media.classList.add("multi");
+    const grid = document.createElement("div");
+    grid.className = "memory-media-grid";
+    mediaItems.forEach((item) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "media-item";
+
+      if (item.type && item.type.startsWith("video")) {
+        const video = document.createElement("video");
+        video.src = item.url;
+        video.controls = true;
+        video.preload = "metadata";
+        wrapper.appendChild(video);
+      } else {
+        const img = document.createElement("img");
+        img.src = item.url;
+        img.alt = memory.title || "Family memory";
+        wrapper.appendChild(img);
+      }
+
+      if (item.caption) {
+        const label = document.createElement("span");
+        label.className = "media-label";
+        label.textContent = item.caption;
+        wrapper.appendChild(label);
+      }
+
+      grid.appendChild(wrapper);
+    });
+    media.appendChild(grid);
+  } else if (mediaItems.length === 1) {
+    const item = mediaItems[0];
+    if (item.type && item.type.startsWith("video")) {
       const video = document.createElement("video");
-      video.src = memory.media_url;
+      video.src = item.url;
       video.controls = true;
       video.preload = "metadata";
       media.appendChild(video);
     } else {
       const img = document.createElement("img");
-      img.src = memory.media_url;
+      img.src = item.url;
       img.alt = memory.title || "Family memory";
       media.appendChild(img);
     }
@@ -211,10 +290,6 @@ const createMemoryCard = (memory) => {
   const story = document.createElement("div");
   story.textContent = memory.story || "";
 
-  const caption = document.createElement("div");
-  caption.className = "memory-caption";
-  caption.textContent = getDisplayCaption(memory);
-
   const tagsWrap = document.createElement("div");
   tagsWrap.className = "tags";
   (memory.tags || []).forEach((tag) => {
@@ -226,7 +301,22 @@ const createMemoryCard = (memory) => {
 
   body.appendChild(title);
   body.appendChild(meta);
-  if (memory.media_url) body.appendChild(caption);
+
+  if (mediaItems.length === 1) {
+    const caption = document.createElement("div");
+    caption.className = "memory-caption";
+    caption.textContent = mediaItems[0].caption || getDisplayCaption(memory);
+    body.appendChild(caption);
+  } else if (mediaItems.length > 1) {
+    const summary = getMediaCaptionSummary(mediaItems);
+    if (summary) {
+      const caption = document.createElement("div");
+      caption.className = "memory-caption";
+      caption.textContent = summary;
+      body.appendChild(caption);
+    }
+  }
+
   if (memory.story) body.appendChild(story);
   if (memory.tags && memory.tags.length) body.appendChild(tagsWrap);
 
@@ -387,7 +477,7 @@ const loadMemories = async () => {
   const { data, error } = await supabaseClient
     .from("memories")
     .select(
-      "id, title, story, tags, location, memory_date, entry_date, created_at, media_url, media_type, media_caption, owner_email"
+      "id, title, story, tags, location, memory_date, entry_date, created_at, media_url, media_type, media_caption, media_items, owner_email"
     )
     .order("memory_date", { ascending: false })
     .order("created_at", { ascending: false });
@@ -491,13 +581,21 @@ const startEditMemory = (memoryId) => {
   ui.memoryStory.value = memory.story || "";
   ui.memoryTags.value = (memory.tags || []).join(", ");
   ui.memoryLocation.value = memory.location || "";
-  ui.memoryCaption.value = memory.media_caption || "";
+  const existingItems = getMediaItems(memory);
+  if (existingItems.length) {
+    ui.memoryCaptions.value = existingItems
+      .map((item) => item.caption || "")
+      .filter((caption) => caption.length || existingItems.length === 1)
+      .join("\n");
+  } else {
+    ui.memoryCaptions.value = "";
+  }
   ui.memoryMedia.value = "";
   ui.memoryMessage.textContent = "";
   toggleModal(true);
 };
 
-const uploadMedia = async (file) => {
+const uploadMediaFile = async (file) => {
   if (!file) return { url: "", type: "" };
   const timestamp = Date.now();
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
@@ -512,6 +610,20 @@ const uploadMedia = async (file) => {
   return { url: data.publicUrl, type: file.type };
 };
 
+const uploadMediaFiles = async (files, captions, baseMemory) => {
+  const items = [];
+  for (let i = 0; i < files.length; i += 1) {
+    const file = files[i];
+    const media = await uploadMediaFile(file);
+    items.push({
+      url: media.url,
+      type: media.type,
+      caption: buildCaptionForFile(baseMemory, file, captions[i] || "")
+    });
+  }
+  return items;
+};
+
 const handleMemorySubmit = async (event) => {
   event.preventDefault();
   if (!supabaseClient || !currentUser) return;
@@ -522,16 +634,8 @@ const handleMemorySubmit = async (event) => {
     const existingMemory = editingMemoryId
       ? memories.find((item) => item.id === editingMemoryId)
       : null;
-    const mediaFile = ui.memoryMedia.files[0];
-
-    let mediaUrl = existingMemory?.media_url || "";
-    let mediaType = existingMemory?.media_type || "";
-
-    if (mediaFile) {
-      const media = await uploadMedia(mediaFile);
-      mediaUrl = media.url;
-      mediaType = media.type;
-    }
+    const mediaFiles = Array.from(ui.memoryMedia.files || []);
+    const captionLines = getCaptionLines(ui.memoryCaptions.value);
 
     const tags = ui.memoryTags.value
       .split(",")
@@ -546,10 +650,20 @@ const handleMemorySubmit = async (event) => {
       entry_date: ui.memoryEntryDate.value || null
     };
 
-    let caption = ui.memoryCaption.value.trim();
-    if (!caption && (mediaFile || mediaUrl)) {
-      caption = getAutoCaption(baseMemory);
+    let mediaItems = existingMemory ? getMediaItems(existingMemory) : [];
+
+    if (mediaFiles.length) {
+      mediaItems = await uploadMediaFiles(mediaFiles, captionLines, baseMemory);
+    } else if (mediaItems.length && captionLines.length) {
+      mediaItems = mediaItems.map((item, index) => ({
+        ...item,
+        caption: captionLines[index]
+          ? captionLines[index]
+          : item.caption || buildCaptionForFile(baseMemory, null, "")
+      }));
     }
+
+    const primaryItem = mediaItems[0] || { url: "", type: "", caption: "" };
 
     const payload = {
       title: baseMemory.title,
@@ -558,9 +672,11 @@ const handleMemorySubmit = async (event) => {
       location: baseMemory.location,
       memory_date: baseMemory.memory_date,
       entry_date: baseMemory.entry_date,
-      media_url: mediaUrl,
-      media_type: mediaType,
-      media_caption: caption
+      media_url: primaryItem.url,
+      media_type: primaryItem.type,
+      media_caption: primaryItem.caption,
+      media_items: mediaItems,
+      owner_email: currentUser.email
     };
 
     let error = null;
@@ -572,10 +688,7 @@ const handleMemorySubmit = async (event) => {
         .eq("id", editingMemoryId);
       error = response.error;
     } else {
-      const response = await supabaseClient.from("memories").insert({
-        ...payload,
-        owner_email: currentUser.email
-      });
+      const response = await supabaseClient.from("memories").insert(payload);
       error = response.error;
     }
 
@@ -633,7 +746,7 @@ const setupHints = () => {
   }
 
   ui.setupHint.textContent =
-    "Need help? Create a Supabase bucket named `memory-lane` and add `media_caption`, `entry_date`, and `is_admin` columns with RLS.";
+    "Need help? Create a Supabase bucket named `memory-lane` and add `media_caption`, `media_items`, `entry_date`, and `is_admin` columns with RLS.";
 };
 
 const initSupabase = async () => {

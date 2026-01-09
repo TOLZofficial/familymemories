@@ -239,11 +239,54 @@
       font-size: 0.95rem;
     }
 
+    .memory-media.multi {
+      height: auto;
+      padding: 8px;
+    }
+
     .memory-media img,
     .memory-media video {
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    .memory-media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+      width: 100%;
+    }
+
+    .media-item {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 110px;
+      background: rgba(30, 26, 22, 0.06);
+    }
+
+    .media-item img,
+    .media-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-label {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      background: rgba(30, 26, 22, 0.65);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      max-width: 90%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .memory-body {
@@ -499,13 +542,13 @@
         </div>
         <div class="field">
           <label for="memoryMedia">Photo or video</label>
-          <input id="memoryMedia" type="file" accept="image/*,video/*" />
+          <input id="memoryMedia" type="file" accept="image/*,video/*" multiple />
           <div class="helper">Optional. Leave empty to keep existing media when editing.</div>
         </div>
         <div class="field">
-          <label for="memoryCaption">Caption for photo/video</label>
-          <input id="memoryCaption" type="text" placeholder="Mom cutting the cake" />
-          <div class="helper">If you leave this empty, the app creates a short caption from the story.</div>
+          <label for="memoryCaptions">Media captions (one per file)</label>
+          <textarea id="memoryCaptions" placeholder="Mom cutting the cake&#10;Cousins at the beach"></textarea>
+          <div class="helper">Optional. If you leave this empty, captions are auto-created from the story.</div>
         </div>
         <div class="actions" style="justify-content: flex-end;">
           <button type="button" class="btn-soft" id="cancelMemoryBtn">Cancel</button>
