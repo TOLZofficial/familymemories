@@ -429,10 +429,12 @@ const sendInviteLink = async (email, username) => {
     return;
   }
 
+  const redirectUrl = `${CONFIG.siteUrl || window.location.origin}/`;
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${CONFIG.siteUrl || window.location.origin}/`
+      emailRedirectTo: redirectUrl,
+      redirectTo: redirectUrl
     }
   });
 
