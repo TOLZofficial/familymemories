@@ -6,6 +6,9 @@ const ui = {
   loginForm: document.getElementById("loginForm"),
   loginEmail: document.getElementById("loginEmail"),
   loginUsername: document.getElementById("loginUsername"),
+  loginCode: document.getElementById("loginCode"),
+  codeField: document.getElementById("codeField"),
+  verifyCodeBtn: document.getElementById("verifyCodeBtn"),
   loginMessage: document.getElementById("loginMessage"),
   appView: document.getElementById("appView"),
   welcomeName: document.getElementById("welcomeName"),
@@ -551,7 +554,8 @@ const sendInviteLink = async (email, username) => {
     return;
   }
 
-  showMessage(ui.loginMessage, "Invite link sent! Check your email.");
+  ui.codeField.style.display = "block";
+  showMessage(ui.loginMessage, "Code sent! Check your email.");
 };
 
 const handleLoginSubmit = async (event) => {
@@ -560,6 +564,36 @@ const handleLoginSubmit = async (event) => {
   const email = ui.loginEmail.value;
   const username = ui.loginUsername.value;
   await sendInviteLink(email, username);
+};
+
+const handleVerifyCode = async () => {
+  if (!supabaseClient) return;
+  const email = ui.loginEmail.value;
+  const username = ui.loginUsername.value;
+  const token = (ui.loginCode.value || "").trim();
+
+  if (!email || !username || !token) {
+    showMessage(ui.loginMessage, "Enter your email, username, and the code.", true);
+    return;
+  }
+
+  if (!isAllowed(email, username)) {
+    showMessage(ui.loginMessage, "That email/username combo is not on the family list.", true);
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.verifyOtp({
+    email,
+    token,
+    type: "email"
+  });
+
+  if (error) {
+    showMessage(ui.loginMessage, error.message, true);
+    return;
+  }
+
+  showMessage(ui.loginMessage, "Signed in.");
 };
 
 const handleSignOut = async () => {
@@ -836,6 +870,7 @@ const registerServiceWorker = () => {
 };
 
 ui.loginForm.addEventListener("submit", handleLoginSubmit);
+ui.verifyCodeBtn.addEventListener("click", handleVerifyCode);
 ui.addMemoryBtn.addEventListener("click", handleAddMemory);
 ui.signOutBtn.addEventListener("click", handleSignOut);
 ui.cancelMemoryBtn.addEventListener("click", handleCancelMemory);

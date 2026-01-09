@@ -456,7 +456,13 @@
           <label for="loginUsername">Family username</label>
           <input id="loginUsername" type="text" placeholder="grandpa-joe" required />
         </div>
-        <button class="btn-primary" type="submit">Send invite link</button>
+        <button class="btn-primary" type="submit">Send code</button>
+        <div class="field" id="codeField" style="display: none;">
+          <label for="loginCode">6-digit code</label>
+          <input id="loginCode" type="text" inputmode="numeric" maxlength="6" placeholder="123456" />
+          <div class="helper">Check your email for the code and enter it here.</div>
+          <button class="btn-soft" type="button" id="verifyCodeBtn">Verify code</button>
+        </div>
         <p class="helper" id="loginMessage"></p>
       </form>
     </section>
