@@ -6,6 +6,7 @@ const ui = {
   loginForm: document.getElementById("loginForm"),
   loginEmail: document.getElementById("loginEmail"),
   loginUsername: document.getElementById("loginUsername"),
+  loginMethod: document.getElementById("loginMethod"),
   loginCode: document.getElementById("loginCode"),
   codeField: document.getElementById("codeField"),
   verifyCodeBtn: document.getElementById("verifyCodeBtn"),
@@ -534,18 +535,20 @@ const isAllowed = (email, username) => {
   );
 };
 
-const sendInviteLink = async (email, username) => {
+const sendInviteLink = async (email, username, method) => {
   if (!isAllowed(email, username)) {
     showMessage(ui.loginMessage, "That email/username combo is not on the family list.", true);
     return;
   }
 
   const redirectUrl = `${CONFIG.siteUrl || window.location.origin}/`;
+  const shouldCreateUser = method === "link";
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
     options: {
       emailRedirectTo: redirectUrl,
-      redirectTo: redirectUrl
+      redirectTo: redirectUrl,
+      shouldCreateUser
     }
   });
 
@@ -554,8 +557,13 @@ const sendInviteLink = async (email, username) => {
     return;
   }
 
-  ui.codeField.style.display = "block";
-  showMessage(ui.loginMessage, "Code sent! Check your email.");
+  if (method === "link") {
+    ui.codeField.style.display = "none";
+    showMessage(ui.loginMessage, "Magic link sent! Check your email.");
+  } else {
+    ui.codeField.style.display = "block";
+    showMessage(ui.loginMessage, "Code sent! Check your email.");
+  }
 };
 
 const handleLoginSubmit = async (event) => {
@@ -563,7 +571,8 @@ const handleLoginSubmit = async (event) => {
   if (!supabaseClient) return;
   const email = ui.loginEmail.value;
   const username = ui.loginUsername.value;
-  await sendInviteLink(email, username);
+  const method = ui.loginMethod.value;
+  await sendInviteLink(email, username, method);
 };
 
 const handleVerifyCode = async () => {
@@ -862,6 +871,14 @@ const initSupabase = async () => {
   const { data } = await supabaseClient.auth.getSession();
   await applyAuthState(data.session);
 };
+
+ui.loginMethod.addEventListener("change", () => {
+  if (ui.loginMethod.value === "code") {
+    ui.codeField.style.display = "block";
+  } else {
+    ui.codeField.style.display = "none";
+  }
+});
 
 const registerServiceWorker = () => {
   if ("serviceWorker" in navigator) {

@@ -456,6 +456,13 @@
           <label for="loginUsername">Family username</label>
           <input id="loginUsername" type="text" placeholder="grandpa-joe" required />
         </div>
+        <div class="field">
+          <label for="loginMethod">Sign-in method</label>
+          <select id="loginMethod">
+            <option value="code" selected>Email code (recommended)</option>
+            <option value="link">Magic link (opens Safari)</option>
+          </select>
+        </div>
         <button class="btn-primary" type="submit">Send code</button>
         <div class="field" id="codeField" style="display: none;">
           <label for="loginCode">6-digit code</label>
